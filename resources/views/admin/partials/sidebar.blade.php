@@ -68,6 +68,13 @@
         </ul>
       </li>
 
+      <li class="menu-item">
+        <a href="{{ route('roadmaps.index') }}" class="menu-link">
+            <i class="menu-icon tf-icons ti ti-mail"></i>
+            <div data-i18n="Roadmaps">Roadmaps</div>
+        </a>
+    </li>
+
       <!-- Apps & Pages -->
       <li class="menu-header small text-uppercase">
         <span class="menu-header-text" data-i18n="Cache Clear">Cache &amp; Clear</span>
