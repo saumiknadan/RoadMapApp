@@ -40,6 +40,12 @@
 
     <ul class="menu-inner py-1">
       
+      <li class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+        <a href="{{ route('dashboard') }}" class="menu-link">
+            <i class="menu-icon tf-icons ti ti-layout-dashboard"></i>
+            <div data-i18n="Dashboard">Dashboard</div>
+        </a>
+      </li>
     
 
       <!-- Forms & Tables -->
@@ -61,18 +67,18 @@
           </li>
         </ul>
       </li>
-      
-      <!-- Tables -->
+
+      <!-- Apps & Pages -->
+      <li class="menu-header small text-uppercase">
+        <span class="menu-header-text" data-i18n="Cache Clear">Cache &amp; Clear</span>
+      </li>
       <li class="menu-item">
-        <a href="tables-basic.html" class="menu-link">
-          <i class="menu-icon tf-icons ti ti-table"></i>
-          <div data-i18n="Tables">Tables</div>
-        </a>
+          <a href="{{ route('admin-cache-clear') }}" class="menu-link">
+              <i class="menu-icon tf-icons ti ti-mail"></i>
+              <div data-i18n="Cache">Cache</div>
+          </a>
       </li>
       
-
-      
-
 
     </ul>
   </aside>
