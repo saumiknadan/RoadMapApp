@@ -4,18 +4,145 @@ namespace App\Http\Controllers;
 
 use App\Models\Roadmap;
 use Illuminate\Http\Request;
+use Validator;
 
 class RoadmapController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
     {
-        $roadmaps = Roadmap::withCount('upvotes')
-            ->with(['comments' => function ($query) {
-                $query->whereNull('parent_id')->with('replies');
-            }])
-            ->orderByDesc('upvotes_count')
-            ->get();
+        try {
+            $roadmaps = Roadmap::query();
+            
+            if ($request->filled('search')) {
+                $roadmaps->where('title', 'like', '%' . $request->search . '%');
+            }
+            $perPage = $request->input('per_page', 10);
+
+            $roadmaps = $roadmaps->orderByDesc('id')
+                ->paginate($perPage)
+                ->appends($request->query());
+
+            return view('admin.roadmaps.index', compact('roadmaps'));
+        } catch (\Throwable $th) {
+            session()->flash('error', 'Something went wrong');
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Show the form for creating a new resource.
+     */
+  
+     public function create()
+     {
+         try {
+             return view('admin.roadmaps.create');
+         } catch (\Exception $e) {
+             session()->flash('error', 'Something went wrong');
+             return redirect()->back();
+         }
+     }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'description' => 'required',
+            'status' => 'required',
+            'category' => 'required|string|max:255',
+        ]);
+
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
+        }
+
+        try {
+            $roadmap = new Roadmap();
+            $roadmap->title = $request->title;
+            $roadmap->description = $request->description;
+            $roadmap->status = $request->status;
+            $roadmap->category = $request->category;
+            $roadmap->save();
+
+            return response()->json(['status' => 1, 'success' => 'Roadmap created successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 2, 'success' => 'Something went wrong']);
+        }
+    }
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit($id)
+    {
+        try {
+            $roadmap = Roadmap::findOrFail($id);
+            return view('admin.roadmaps.edit', compact('roadmap'));
+        } catch (\Throwable $th) {
+            session()->flash('error', 'Something went wrong');
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
     
-        return view('admin.roadmaps.index', compact('roadmaps'));
+    public function update(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|string|max:255',
+            'description' => 'required',
+            'status' => 'required',
+            'category' => 'required|string|max:255',
+        ]);
+
+        if (!$validator->passes()) {
+            return response()->json(['status' => 0, 'error' => $validator->errors()->toArray()]);
+        }
+
+        try {
+            $roadmap = Roadmap::findOrFail($id);
+            $roadmap->title = $request->title;
+            $roadmap->description = $request->description;
+            $roadmap->status = $request->status;
+            $roadmap->category = $request->category;
+            $roadmap->save();
+
+            return response()->json(['status' => 1, 'success' => 'Roadmap updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => 2, 'success' => 'Something went wrong']);
+        }
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    
+    public function destroy($id)
+    {
+        try {
+            $roadmap = Roadmap::findOrFail($id);
+            $roadmap->delete();
+
+            session()->flash('success', 'Roadmap deleted successfully');
+            return redirect()->back();
+        } catch (\Exception $e) {
+            session()->flash('error', 'Something went wrong');
+            return redirect()->back();
+        }
     }
 }

@@ -31,3 +31,8 @@
           toastr.warning("{{ session('warning') }}")
       @endif
   </script>
+
+<script src="{{ asset('assets/js/main.js') }}"></script>
+
+<!-- Page JS -->
+@yield('scripts')
